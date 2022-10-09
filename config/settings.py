@@ -62,6 +62,7 @@ INSTALLED_APPS = [
 
     # local
     'user',
+    'phone',
 ]
 
 REST_FRAMEWORK = {
@@ -146,6 +147,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'user.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -188,6 +191,7 @@ REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'my-app-auth'
 
 # allauth
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
@@ -195,3 +199,8 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/success_verify'
 # LOGIN_URL = '/auth/login'
+
+
+TWILIO_PHONE = os.environ.get('TWILIO_PHONE', default=None)
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', default=None)
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', default=None)
