@@ -23,17 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
-# CORS_ORIGIN_WHITELIST = os.environ.get("CORS").split(" ")
-
-if DEBUG == 0:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
+# DEBUG = os.environ.get('DEBUG')
 
 # Application definition
 
@@ -49,7 +39,6 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     'corsheaders',
-    'debug_toolbar',
     'rest_framework',
     'rest_framework.authtoken',
 
@@ -63,11 +52,12 @@ INSTALLED_APPS = [
     # local
     'user',
     'phone',
+    'enode',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
 }
@@ -79,7 +69,6 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -127,6 +116,14 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+# REST_AUTH_SERIALIZERS = {
+#     'LOGIN_SERIALIZER': 'phone.serializers.PhoneNumberSerializer'
+# }
+
+# REST_AUTH_REGISTER_SERIALIZERS = {
+#     'REGISTER_SERIALIZER': 'auth.serializers.RegisterWithPhoneSerializer'
+# }
 
 
 # Password validation
@@ -176,10 +173,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_USE_TLS = True
-
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
@@ -194,11 +188,11 @@ JWT_AUTH_COOKIE = 'my-app-auth'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/success_verify'
-# LOGIN_URL = '/auth/login'
+LOGIN_URL = '/auth/login'
 
 
 TWILIO_PHONE = os.environ.get('TWILIO_PHONE', default=None)

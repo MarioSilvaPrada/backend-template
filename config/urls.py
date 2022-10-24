@@ -23,5 +23,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('auth.urls')),
     path('user/', include('user.urls')),
-    path('__debug__/', include('debug_toolbar.urls')),
+    path('phone/', include('phone.urls')),
+    path('car/', include('car.urls')),
+    path('enode/', include('enode.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+
+    urlpatterns += [
+        path('__debug__/', include('debug_toolbar.urls')),
+    ]

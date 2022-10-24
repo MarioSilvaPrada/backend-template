@@ -7,8 +7,6 @@ from .views import success_verify
 
 
 urlpatterns = [
-
-
     path('register/', RegisterView.as_view()),
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
@@ -26,5 +24,4 @@ urlpatterns = [
     path('password-reset/', PasswordResetView.as_view()),
     path('password-reset-confirm/<slug:uidb64>/<slug:token>/',
          PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-
 ]

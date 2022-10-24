@@ -1,11 +1,12 @@
 
-from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
+from django.core.validators import RegexValidator
 from django.db import models
 from phone.models import TimestampedModel
 import pyotp
+
 
 class UserManager(BaseUserManager):
     """
@@ -18,20 +19,19 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **extra_fields):
         """Create and return a `User` with an email and password."""
-        
+
         if email is None:
             raise TypeError('Users must have an email address.')
 
         user = self.model(email=self.normalize_email(email), **extra_fields)
-        
+
         user.set_password(password)
-        
+
         user.save(using=self._db)
 
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-
         """
         Create and return a `User` with superuser powers.
         Superuser powers means that this use is an admin that can do anything
@@ -40,7 +40,7 @@ class UserManager(BaseUserManager):
         if password is None:
             raise TypeError('Superusers must have a password.')
 
-        user = self.create_user(email,password=password, **extra_fields)
+        user = self.create_user(email, password=password, **extra_fields)
         user.is_superuser = True
         user.is_staff = True
         user.save()
@@ -48,19 +48,20 @@ class UserManager(BaseUserManager):
         return user
 
 
+phone_regex = RegexValidator(
+    regex=r'^\+?1?\d{9,15}$', message="Please insert a valid phone number")
+
+
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     email = models.EmailField(db_index=True, unique=True)
-    is_active = models.BooleanField(default = True)
-    is_staff = models.BooleanField(default = False)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-
-    key = models.CharField(max_length=100, unique=True, blank=True)
-    enable_authenticator = models.BooleanField(default=False) #We can use this to enable 2fa for users
     objects = UserManager()
 
     class Meta:
-        verbose_name ='user'
+        verbose_name = 'user'
         verbose_name_plural = 'users'
 
     def __str__(self):
@@ -70,10 +71,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
         """
         return self.email
 
-    def get_short_name(self):
-        
-        return self.first_name
-    
+    # def get_short_name(self):
+
+    #     return self.first_name
+
     def authenticate(self, otp):
         """ This method authenticates the given otp"""
         provided_otp = 0
@@ -81,7 +82,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
             provided_otp = int(otp)
         except:
             return False
-        #Here we are using Time Based OTP. The interval is 60 seconds.
-        #otp must be provided within this interval or it's invalid
+        # Here we are using Time Based OTP. The interval is 60 seconds.
+        # otp must be provided within this interval or it's invalid
         t = pyotp.TOTP(self.key, interval=300)
         return t.verify(provided_otp)
