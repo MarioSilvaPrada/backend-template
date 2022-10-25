@@ -8,6 +8,10 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
     def get_queryset(self):
         return self.queryset.filter(id=self.request.user.id)
+
+    def get_object(self):
+        return self.request.user
     

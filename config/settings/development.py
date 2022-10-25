@@ -1,4 +1,5 @@
 
+from datetime import timedelta
 from .base import *
 
 DEBUG = True
@@ -11,7 +12,7 @@ INSTALLED_APPS.append('debug_toolbar')
 MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
 
-ACCESS_TOKEN_LIFETIME = 1000
+SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'] = timedelta(hours=2)
 
 ENODE_CLIENT_ID = os.environ.get('ENODE_CLIENT_ID_SANDBOX', default=None)
 ENODE_CLIENT_SECRET = os.environ.get(

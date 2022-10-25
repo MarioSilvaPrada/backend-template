@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'user',
     'phone',
     'enode',
+    'car',
 ]
 
 REST_FRAMEWORK = {
@@ -61,6 +62,8 @@ REST_FRAMEWORK = {
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
 }
+
+SIMPLE_JWT = {}
 
 
 SITE_ID = 1

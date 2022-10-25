@@ -5,6 +5,10 @@ from requests.auth import HTTPBasicAuth
 from .models import EnodeTokenModel
 from django.conf import settings
 
+from rest_framework import status
+from rest_framework.response import Response
+
+
 username = getattr(settings, "ENODE_CLIENT_ID", None)
 password = getattr(settings, "ENODE_CLIENT_SECRET", None)
 
@@ -51,4 +55,22 @@ def get_token():
         current_token.save()
         return params['access_token']
 
-    return current_token
+    return current_token.access_token
+
+
+def set_enode_endpoint(request, endpoint, method='GET', data=None):
+    token = get_token()
+    if token:
+        user_id = request.user.id
+        url = f'https://enode-api.sandbox.enode.io/{endpoint}'
+        headers = {"Authorization": f"Bearer {token}",
+                   "Enode-User-Id": f"{user_id}"}
+        if method == 'GET':
+            response = requests.get(url, headers=headers)
+        if method == 'POST':
+            response = requests.post(url, headers=headers, json=data)
+        data = response.json()
+        status_code = response.status_code
+        print(data, status_code, url)
+        return Response(data, status=status_code)
+    return Response({"message": "failed to get Enode token"}, status=status.HTTP_400_BAD_REQUEST)
