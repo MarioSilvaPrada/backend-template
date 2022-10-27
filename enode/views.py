@@ -1,4 +1,5 @@
 import json
+import logging
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -6,11 +7,14 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .actions import get_token, set_enode_endpoint
+from core.tasks import sample_task
 
 
 @api_view(['GET'])
 def enode_token_view(request):
     token = get_token()
+    sample_task()
+    logging.info(token)
     if token:
         return Response({"current_token": token}, status=status.HTTP_200_OK)
     return Response({"message": "fail to get token"}, status=status.HTTP_400_BAD_REQUEST)
@@ -98,3 +102,16 @@ def control_charging(request, vehicle_id):
     endpoint = f'vehicles/{vehicle_id}/charging'
     body = json.loads(request.body)
     return set_enode_endpoint(request, endpoint, method='POST', data=body)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def webhook(request):
+    endpoint = 'webhooks/firehose/test'
+    return set_enode_endpoint(request, endpoint, method='POST')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def schedule_statistics(request):
+    endpoint = 'statistics/charging'
+    return set_enode_endpoint(request, endpoint)

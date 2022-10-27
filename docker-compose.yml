@@ -1,9 +1,11 @@
 version: '3.7'
 services:
   app:
-    tty: true
+    # tty: true
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python3 manage.py wait_for_db &&
+            python3 manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -16,8 +18,38 @@ services:
     image: postgres:11
     env_file:
       - ./.env.db
-    # volumes:
-    #   - pgdata:/var/lib/postgresql/data/
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
     labels:
       description: "Postgresql Database"
       service: "postgresql"
+  redis:
+    image: redis:alpine
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A core worker -l info
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+      - app
+  celery-beat:
+    restart: always
+    build:
+      context: .
+    command: celery -A core beat -l info
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+      - app
+volumes:
+  pgdata:

@@ -1,10 +1,5 @@
 from django.urls import path
-# from rest_framework import routers
-
 from enode import views
-
-# router = routers.SimpleRouter()
-# router.register(r'^vehicle/<vehicle_id>/(?P<field>\w+)/$', views.get_vehicle_id, basename='enode-vehicle')
 
 urlpatterns = [
     path('token/', views.enode_token_view),
@@ -18,4 +13,6 @@ urlpatterns = [
     path('schedules/', views.get_schedules),
     path('health/', views.get_car_health),
     path('available-vendors/', views.get_available_vendors),
+    path('webhook/', views.webhook),
+    path('statistics/charging/', views.schedule_statistics),
 ]

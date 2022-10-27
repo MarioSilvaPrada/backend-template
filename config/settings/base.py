@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+from datetime import timedelta
+# import core.tasks
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,16 +52,21 @@ INSTALLED_APPS = [
 
 
     # local
+    'core',
     'user',
     'phone',
     'enode',
     'car',
+    'data'
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
@@ -201,3 +208,14 @@ LOGIN_URL = '/auth/login'
 TWILIO_PHONE = os.environ.get('TWILIO_PHONE', default=None)
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', default=None)
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', default=None)
+
+# Celery
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+# CELERY_BEAT_SCHEDULE = {
+#     "sample_task": {
+#         "task": "core.tasks.sample_task",
+#         "schedule": timedelta(seconds=10),
+#     },
+# }

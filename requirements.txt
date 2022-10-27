@@ -11,6 +11,9 @@ django-storages==1.11.1
 boto3
 django-debug-toolbar==3.6.0
 django-jazzmin==2.5.0
+celery==5.2.7
+redis
+xlrd
 
 # auth
 dj-rest-auth==2.2.5

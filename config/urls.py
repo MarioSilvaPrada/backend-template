@@ -26,10 +26,12 @@ urlpatterns = [
     path('phone/', include('phone.urls')),
     path('car/', include('car.urls')),
     path('enode/', include('enode.urls')),
+    path('data/', include('data.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
-
+    import debug_toolbar
     urlpatterns += [
-        path('__debug__/', include('debug_toolbar.urls')),
+        path('__debug__/', include(debug_toolbar.urls))
     ]
+    
