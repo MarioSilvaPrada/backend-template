@@ -42,7 +42,6 @@ class RegisterWithPhoneSerializer(serializers.Serializer):
                     detail=serializers.as_serializer_error(exc)
             )
         user.save()
-        print('O meu user',user)
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user

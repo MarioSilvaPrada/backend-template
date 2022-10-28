@@ -43,9 +43,7 @@ def get_token():
         return params['access_token']
 
     current_token = EnodeTokenModel.objects.all()[0]
-    now_timestamp = datetime.now().timestamp()
-    expiration_timestamp = current_token.expires_date.timestamp()
-    if now_timestamp > expiration_timestamp:
+    if current_token.is_token_expired():
         params = generate_enode_token()
         current_token.access_token = params['access_token']
         current_token.expires_in = params['expires_in']
@@ -71,6 +69,5 @@ def set_enode_endpoint(request, endpoint, method='GET', data=None):
             response = requests.post(url, headers=headers, json=data)
         data = response.json()
         status_code = response.status_code
-        print(data, status_code, url)
         return Response(data, status=status_code)
     return Response({"message": "failed to get Enode token"}, status=status.HTTP_400_BAD_REQUEST)

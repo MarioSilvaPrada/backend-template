@@ -55,6 +55,13 @@ def get_charger(request):
     return set_enode_endpoint(request, endpoint)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_charger_action(request, action_id):
+    endpoint = f'vehicles/actions/{action_id}'
+    return set_enode_endpoint(request, endpoint)
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def get_schedules(request):
@@ -109,6 +116,7 @@ def control_charging(request, vehicle_id):
 def webhook(request):
     endpoint = 'webhooks/firehose/test'
     return set_enode_endpoint(request, endpoint, method='POST')
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

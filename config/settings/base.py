@@ -205,6 +205,9 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/success_verify'
 LOGIN_URL = '/auth/login'
 
 
+NORDPOOL_FTP_USERNAME = os.environ.get('NORDPOOL_FTP_USERNAME', default=None)
+NORDPOOL_FTP_PASSWORD = os.environ.get('NORDPOOL_FTP_PASSWORD', default=None)
+
 TWILIO_PHONE = os.environ.get('TWILIO_PHONE', default=None)
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', default=None)
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', default=None)
