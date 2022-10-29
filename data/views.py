@@ -1,4 +1,5 @@
 import ftplib
+import logging
 import xlrd
 import json
 from datetime import datetime
@@ -6,11 +7,12 @@ from datetime import datetime
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
+from rest_framework.generics import ListAPIView
 
 from .models import EnergyPrice
+from .serializers import EnergyLineSerializer
 
 
 files_map = [
@@ -94,3 +96,29 @@ def get_energy_prices(request):
         )
 
     return Response(data, status=200)
+
+
+class EnergyLineView(ListAPIView):
+    queryset = EnergyPrice.objects.all()
+    serializer_class = EnergyLineSerializer
+
+    def get_queryset(self):
+        fromDate = self.request.query_params.get('from')
+        toDate = self.request.query_params.get('to')
+        if fromDate and toDate:
+            return self.queryset.filter(date__range=(fromDate, toDate))
+        return self.queryset.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+
+        serializer = self.get_serializer(queryset, many=True)
+        region_values = serializer.data[0]
+        print('here', region_values)
+        return Response(serializer.data)
