@@ -5,8 +5,6 @@ from .models import EnergyPrice
 
 class EnergyLineSerializer(serializers.ModelSerializer):
 
-    
-
     class Meta:
         model = EnergyPrice
         fields = '__all__'

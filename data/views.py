@@ -2,14 +2,16 @@ import ftplib
 import logging
 import xlrd
 import json
-from datetime import datetime
+import operator
+from datetime import datetime, timedelta
 
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from django.conf import settings
 from rest_framework.generics import ListAPIView
+from rest_framework import status
+from django.conf import settings
 
 from .models import EnergyPrice
 from .serializers import EnergyLineSerializer
@@ -83,7 +85,6 @@ def get_energy_prices(request):
 
     EnergyPrice.objects.all().delete()
     for date in data.keys():
-        print(date)
         format = "%Y-%m-%d %H:%M:%S"
         date_time = datetime.strptime(date, format).date()
         values = json.dumps(data[date][region])
@@ -95,7 +96,7 @@ def get_energy_prices(request):
             SE4=json.dumps(data[date]["SE4"]),
         )
 
-    return Response(data, status=200)
+    return Response(data, status=status.HTTP_200_OK)
 
 
 class EnergyLineView(ListAPIView):
@@ -117,8 +118,44 @@ class EnergyLineView(ListAPIView):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-
         serializer = self.get_serializer(queryset, many=True)
         region_values = serializer.data[0]
-        print('here', region_values)
         return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_energy_line(request, region):
+    queryset = EnergyPrice.objects.all()
+
+    fromDate = request.query_params.get('from')
+    toDate = request.query_params.get('to')
+
+    if fromDate and toDate:
+        queryset = queryset.filter(date__range=(fromDate, toDate))
+
+    data = []
+
+    for item in queryset:
+        date = item.date
+        region_obj = {
+            "SE1": item.SE1,
+            "SE2": item.SE2,
+            "SE3": item.SE3,
+            "SE4": item.SE4,
+        }
+        value = region_obj[region]
+        list = json.loads(value)
+
+        for index, value in enumerate(list):
+            obj = {}
+            year = date.year
+            month = date.month
+            day = date.day
+            date_hour = datetime(year, month, day, index, 0, 0)
+            obj['date'] = date_hour
+            obj['value'] = value
+            data.append(obj)
+
+    sorted_data = sorted(data, key=lambda t: t['date'])
+    return Response(sorted_data, status=status.HTTP_200_OK)
