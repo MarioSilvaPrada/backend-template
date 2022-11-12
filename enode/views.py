@@ -1,4 +1,5 @@
 import json
+import secrets
 import logging
 
 from rest_framework.response import Response
@@ -6,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from .actions import get_token, set_enode_endpoint
+from .actions import get_token, set_enode_endpoint, set_webhook_endpoint
 from core.tasks import sample_task
 
 
@@ -62,6 +63,13 @@ def get_charger_action(request, action_id):
     return set_enode_endpoint(request, endpoint)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_schedule_status(request, id):
+    endpoint = f'schedules/{id}/status'
+    return set_enode_endpoint(request, endpoint)
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def get_schedules(request):
@@ -73,7 +81,7 @@ def get_schedules(request):
 
 
 # {
-#   "targetId": "601a28bf-eb2d-49e8-8e95-22b4857e3a7a",
+#   "targetId": "3bcf0e69-5889-49ba-ad52-844f6e942f5e",
 #   "chargingLocationId": null,
 #  "defaultShouldCharge": false,
 #   "rules": [
@@ -111,11 +119,21 @@ def control_charging(request, vehicle_id):
     return set_enode_endpoint(request, endpoint, method='POST', data=body)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def verifyWebhook(request):
+    endpoint = 'webhooks/firehose'
+    data = {
+        "secret": secrets.token_hex(32),
+        "url": 'http://0.0.0.0:8000/enode/webhook/'
+    }
+    return set_webhook_endpoint(request, endpoint, method='PUT', data=data)
+
+
+@api_view(['POST'])
 def webhook(request):
-    endpoint = 'webhooks/firehose/test'
-    return set_enode_endpoint(request, endpoint, method='POST')
+    print('caca', request)
+    return Response({"SUCCESS"}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

@@ -1,8 +1,6 @@
 import ftplib
-import logging
 import xlrd
 import json
-import operator
 from datetime import datetime, timedelta
 
 

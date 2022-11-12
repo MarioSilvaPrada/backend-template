@@ -1,4 +1,5 @@
 
+import logging
 import requests
 from datetime import datetime, timedelta
 from requests.auth import HTTPBasicAuth
@@ -67,6 +68,27 @@ def set_enode_endpoint(request, endpoint, method='GET', data=None):
             response = requests.get(url, headers=headers)
         if method == 'POST':
             response = requests.post(url, headers=headers, json=data)
+        if method == 'PUT':
+            response = requests.put(url, headers=headers, json=data)
+        data = response.json()
+        status_code = response.status_code
+        return Response(data, status=status_code)
+    return Response({"message": "failed to get Enode token"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def set_webhook_endpoint(request, endpoint, method='PUT', data=None):
+    token = get_token()
+    logging.warning(token)
+    if token:
+        url = f'https://enode-api.sandbox.enode.io/{endpoint}'
+        headers = {"Authorization": f"Bearer {token}",
+                   "Accept": "application/json"}
+        if method == 'GET':
+            response = requests.get(url, headers=headers)
+        if method == 'POST':
+            response = requests.post(url, headers=headers, json=data)
+        if method == 'PUT':
+            response = requests.put(url, headers=headers, json=data)
         data = response.json()
         status_code = response.status_code
         return Response(data, status=status_code)
